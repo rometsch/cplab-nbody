@@ -29,6 +29,7 @@ nbsys::nbsys(std::string filename) {
 
 	// Read system parameters from first line. Must be: " N   t_max   eta".
 	dfile >> this->N;	// Number of particles.
+	std::cout << this->N << std::endl;
 	dfile >> this->t_max;	// Maximal integration time.
 	dfile >> this->eta;		// Timestep parameter.
 
@@ -48,10 +49,18 @@ nbsys::nbsys(std::string filename) {
 	this->ax = new double[this->N];
 	this->ay = new double[this->N];
 	this->az = new double[this->N];
+	// Acceleration derivatives.
+	this->adotx = new double[this->N];
+	this->adoty = new double[this->N];
+	this->adotz = new double[this->N];
+
 	for (int i=0; i<this->N; i++) {
 		this->ax[i] = 0;
 		this->ay[i] = 0;
 		this->az[i] = 0;
+		this->adotx[i] = 0;
+		this->adoty[i] = 0;
+		this->adotz[i] = 0;
 	}
 
 	double M=0;
@@ -202,6 +211,73 @@ void nbsys::transform_to_com() {
 		this->vy[i] -= this->Pcomy;
 		this->vz[i] -= this->Pcomz;
 	}
-
 }
+
+void nbsys::acc(int i) {
+	// Calculate the acceleration for particle i.
+	double a1 = 0;
+	double a2 = 0;
+	double a3 = 0;
+	for (int j=0; j<this->N; j++) {
+		if (j==i) continue;	// Exclude self interaction.
+		double rij1 = this->rx[j] - this->rx[i];
+		double rij2 = this->ry[j] - this->ry[i];
+		double rij3 = this->rz[j] - this->rz[i];
+		double rij_sq = rij1*rij1 + rij2*rij2 + rij3*rij3;
+		double rij_cu = rij_sq * sqrt(rij_sq);
+		a1 += this->m[j]*rij1/rij_cu;
+		a2 += this->m[j]*rij2/rij_cu;
+		a3 += this->m[j]*rij3/rij_cu;
+	}
+
+	// Store result in system variables.
+	this->ax[i] = a1;
+	this->ay[i] = a2;
+	this->az[i] = a3;
+}
+
+void nbsys::dot_acc(int i) {
+	// Calculate time derivative of acceleration for particle i.
+	double adot1 = 0;
+	double adot2 = 0;
+	double adot3 = 0;
+	for (int j=0; j<this->N; j++) {
+		if (j==i) continue;	// Exclude self interaction.
+		double rij1 = this->rx[j] - this->rx[i];
+		double rij2 = this->ry[j] - this->ry[i];
+		double rij3 = this->rz[j] - this->rz[i];
+
+		double vij1 = this->vx[j] - this->vx[i];
+		double vij2 = this->vy[j] - this->vy[i];
+		double vij3 = this->vz[j] - this->vz[i];
+
+		double vij_dot_rij = vij1*rij1 + vij2*rij2 + vij3*rij3;
+
+		double rij_sq = rij1*rij1 + rij2*rij2 + rij3*rij3;
+		double rij_cu = rij_sq * sqrt(rij_sq);
+		double rij_qui = rij_sq*rij_cu;
+
+		adot1 += this->m[j]*(vij1/rij_cu - 3*vij_dot_rij/rij_qui*rij1);
+		adot2 += this->m[j]*(vij2/rij_cu - 3*vij_dot_rij/rij_qui*rij2);
+		adot3 += this->m[j]*(vij3/rij_cu - 3*vij_dot_rij/rij_qui*rij3);
+
+	}
+
+	// Store result in system variables.
+	this->adotx[i] = adot1;
+	this->adoty[i] = adot2;
+	this->adotz[i] = adot3;
+}
+
+void nbsys::calc_acc() {
+	// Calculate the acceleration for all particles.
+	for (int i=0; i<this->N; i++) this->acc(i);
+}
+
+void nbsys::calc_dot_acc() {
+	// Calculate the time derivative oft the acceleration for all particles.
+	for (int i=0; i<this->N; i++) this->dot_acc(i);
+}
+
+
 

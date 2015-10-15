@@ -12,12 +12,13 @@
 #include <fstream>
 #include <cmath>
 
+
 class nbsys {
 public:
 	int N;		// Number of particles.
 	double t_max;	// Maximal integration time.
 	double eta;		// Time step parameter.
-	double *rx, *ry, *rz, *vx, *vy, *vz, *ax, *ay, *az;	// Position, velocity and acceleration components.
+	double *rx, *ry, *rz, *vx, *vy, *vz, *ax, *ay, *az, *adotx, *adoty, *adotz;	// Position, velocity and acceleration components.
 	double *m;		// Mass of particles.
 
 	double Rx, Ry, Rz;		// Center of mass (COM) coordinate.
@@ -41,7 +42,10 @@ public:
 	void calc_momentum();		// Calculate the total momentum.
 	void calc_angular_momentum();
 
-
+	void calc_acc();	// Calculate the acceleration for all particles.
+	void calc_dot_acc();	// Calculate the time derivative oft the acceleration for all particles.
+	void acc(int i);	// Calculate the acceleration for particle i.
+	void dot_acc(int i);	// Calculate time derivative of acceleration for particle i.
 
 	void load_data(std::string filename);		// Load initial data from file.
 	void transform_to_com();	// Transform the coordinates and velocities to
