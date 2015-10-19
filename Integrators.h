@@ -42,4 +42,29 @@ public:
 	void iterate_ind(int i);
 };
 
+class Mittelung: public Integrator {
+public:
+
+	Mittelung(std::string filename, double dt);
+	virtual ~Mittelung();
+
+	void iterate();
+	void iterate_ind(int i);
+};
+
+class LeapFrog: public Integrator {
+public:
+
+	double *r_half_x, *r_half_y, *r_half_z;	// Half time positions.
+
+
+	LeapFrog(std::string filename, double dt);
+	virtual ~LeapFrog();
+
+	void jump_start();
+	void jump();
+	void iterate();
+	void iterate_ind(int i);
+};
+
 #endif /* INTEGRATORS_H_ */
