@@ -34,6 +34,9 @@ public:
 	e, ex, ey, ez,	// Runge-Lenz vector.
 	ae;		// Major axis of ellipse.
 
+	// Time keepers.
+	std::vector<double> simulation_time, real_time;
+	double sim_time;
 
 	Logger(Integrator *integrator);
 	virtual ~Logger();

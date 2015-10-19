@@ -17,6 +17,7 @@ Logger::Logger(Integrator *integrator) {
 		Y.push_back(std::vector<double> ());
 		Z.push_back(std::vector<double> ());
 	}
+	this->sim_time = 0;
 }
 
 Logger::~Logger() {
@@ -27,6 +28,7 @@ void Logger::iterate(int Niter, int step) {
 	// Iterate Niter times and keep every step-th system status.
 	for (int i=0; i<Niter; i++) {
 		integrator->iterate();
+		this->sim_time += this->integrator->dt;
 		this->nbs->calc_energy();
 		std::cout << this->nbs->E << std::endl;
 		// Store every step-th set of positions.
@@ -71,6 +73,8 @@ void Logger::snapshot() {
 	this->ez.push_back(this->nbs->ez);
 	this->ae.push_back(this->nbs->ae);
 
+	// Time
+	this->simulation_time.push_back(sim_time);
 }
 
 
