@@ -19,6 +19,8 @@ public:
 	Integrator(std::string filename);
 	virtual ~Integrator();
 
+	virtual void start() = 0;			// Start the integrator. E.g. jumpstart for Leap Frog.
+	virtual void stop() = 0;			// Stop the integrator.	E.g. stop for Leap Frog.
 	virtual void iterate() = 0;		// Iterate once.
 };
 
@@ -28,6 +30,8 @@ public:
 	Euler(std::string filename, double dt);
 	virtual ~Euler();
 
+	void start();
+	void stop();
 	void iterate();
 	void iterate_ind(int i);
 };
@@ -38,6 +42,8 @@ public:
 	Euler_Comer(std::string filename, double dt);
 	virtual ~Euler_Comer();
 
+	void start();
+	void stop();
 	void iterate();
 	void iterate_ind(int i);
 };
@@ -48,6 +54,8 @@ public:
 	Mittelung(std::string filename, double dt);
 	virtual ~Mittelung();
 
+	void start();
+	void stop();
 	void iterate();
 	void iterate_ind(int i);
 };
@@ -55,16 +63,42 @@ public:
 class LeapFrog: public Integrator {
 public:
 
-	double *r_half_x, *r_half_y, *r_half_z;	// Half time positions.
-
-
 	LeapFrog(std::string filename, double dt);
 	virtual ~LeapFrog();
 
-	void jump_start();
-	void jump();
+	void start();
+	void stop();
 	void iterate();
 	void iterate_ind(int i);
+};
+
+class Verlet: public Integrator {
+public:
+
+	double *rx_last, *ry_last, *rz_last; 	// Position, velocity and acceleration components.
+
+	Verlet(std::string filename, double dt);
+	virtual ~Verlet();
+
+	void start();
+	void stop();
+	void iterate();
+	void iterate_ind(int i);
+};
+
+class HermitePC: public Integrator {
+public:
+
+	double *rx_p, *ry_p, *rz_p, *vx_p, *vy_p, *vz_p, *ax_p, *ay_p, *az_p, *adotx_p, *adoty_p, *adotz_p; 	// Position, velocity and acceleration components.
+
+	HermitePC(std::string filename, double dt);
+	virtual ~HermitePC();
+
+	void start();
+	void stop();
+	void iterate();
+	void iterate_ind(int i);
+	void iterate_correction_ind(int i);
 };
 
 #endif /* INTEGRATORS_H_ */

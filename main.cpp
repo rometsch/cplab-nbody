@@ -11,10 +11,10 @@
 
 
 int main() {
-	Euler *integrator = new Euler("/Users/thomas/GoogleDrive/uni/ComPhy/n-body/data/in2", 0.001);
+	Integrator *integrator = new HermitePC("/Users/thomas/GoogleDrive/uni/ComPhy/n-body/data/pla3", 0.01);
 
 	Logger log(integrator);
-	log.iterate(30000,20);
+	log.iterate(5000,50);
 	log.plot_trajectories();
 
 	delete integrator;
