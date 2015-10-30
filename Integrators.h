@@ -90,6 +90,7 @@ class HermitePC: public Integrator {
 public:
 
 	double *rx_p, *ry_p, *rz_p, *vx_p, *vy_p, *vz_p, *ax_p, *ay_p, *az_p, *adotx_p, *adoty_p, *adotz_p; 	// Position, velocity and acceleration components.
+	double *a2x, *a2y, *a2z, *a3x, *a3y, *a3z; 	// Higher time derivatives of a.
 
 	HermitePC(std::string filename, double dt);
 	virtual ~HermitePC();
@@ -99,6 +100,41 @@ public:
 	void iterate();
 	void iterate_ind(int i);
 	void iterate_correction_ind(int i);
+	void calc_acc_derivatives(int i);
 };
+
+class HermiteIterated: public Integrator {
+public:
+	int iteration_depth;
+	double *rx_p, *ry_p, *rz_p, *vx_p, *vy_p, *vz_p, *ax_p, *ay_p, *az_p, *adotx_p, *adoty_p, *adotz_p; 	// Position, velocity and acceleration components.
+	double *a2x, *a2y, *a2z, *a3x, *a3y, *a3z; 	// Higher time derivatives of a.
+
+	HermiteIterated(std::string filename, double dt, int iteration_depth);
+	virtual ~HermiteIterated();
+
+	void start();
+	void stop();
+	void iterate();
+	void iterate_ind(int i);
+	void iterate_correction_ind(int i);
+	void calc_acc_derivatives(int i);
+};
+
+class RungeKutta: public Integrator {
+public:
+
+	// Variables for temporary values.
+	double *rx_t, *ry_t, *rz_t, *vx_t, *vy_t, *vz_t, *ax_t, *ay_t, *az_t;
+	double *rx_aux, *ry_aux, *rz_aux;
+
+	RungeKutta(std::string filename, double dt);
+	virtual ~RungeKutta();
+
+	void start();
+	void stop();
+	void iterate();
+	void iterate_ind(int i);
+};
+
 
 #endif /* INTEGRATORS_H_ */
