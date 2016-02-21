@@ -21,13 +21,9 @@ void save_N_body_sim_to_file(Integrator *integrator, double dt, double num_of_tm
 
 int main() {
 
-
-
-//	aufgabe2a();
-//	aufgabe2b();
-
+	aufgabe2a();
+	aufgabe2b();
 	aufgabe3();
-
 
 }
 
