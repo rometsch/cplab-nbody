@@ -37,11 +37,16 @@ Integrator::~Integrator() {
 	delete this->nbs;
 }
 
+void Integrator::set_dt(double dt) {
+	// Set dt value.
+	this->dt = dt;
+}
 
 Euler::Euler(std::string filename, double dt)
 	: Integrator(filename) {
 	// Create new Integrator.
 	this->dt = dt;
+	this->name = "Euler";
 }
 
 Euler::~Euler() {
@@ -79,21 +84,22 @@ void Euler::iterate() {
 	}
 }
 
-Euler_Comer::Euler_Comer(std::string filename, double dt)
+EulerComer::EulerComer(std::string filename, double dt)
 	: Integrator(filename) {
 	// Create new Integrator.
 	this->dt = dt;
+	this->name = "EulerComer";
 }
 
-Euler_Comer::~Euler_Comer() {
+EulerComer::~EulerComer() {
 
 }
 
-void Euler_Comer::start() {}	//	Nothing to do.
-void Euler_Comer::stop() {}	//	Nothing to do.
+void EulerComer::start() {}	//	Nothing to do.
+void EulerComer::stop() {}	//	Nothing to do.
 
 
-void Euler_Comer::iterate_ind(int i) {
+void EulerComer::iterate_ind(int i) {
 	// Iterate velocity.
 	this->vx_next[i] = this->nbs->vx[i] + this->nbs->ax[i]*this->dt;
 	this->vy_next[i] = this->nbs->vy[i] + this->nbs->ay[i]*this->dt;
@@ -104,7 +110,7 @@ void Euler_Comer::iterate_ind(int i) {
 	this->rz_next[i] = this->nbs->rz[i] + this->vz_next[i]*this->dt;
 }
 
-void Euler_Comer::iterate() {
+void EulerComer::iterate() {
 	// Iterate all particles.
 	this->nbs->calc_acc();
 	for (int i=0; i<this->nbs->N; i++) {
@@ -126,6 +132,7 @@ Mittelung::Mittelung(std::string filename, double dt)
 	: Integrator(filename) {
 	// Create new Integrator.
 	this->dt = dt;
+	this->name = "Mittelung";
 }
 
 Mittelung::~Mittelung() {
@@ -170,6 +177,7 @@ LeapFrog::LeapFrog(std::string filename, double dt)
 	: Integrator(filename) {
 	// Create new Integrator.
 	this->dt = dt;
+	this->name = "LeapFrog";
 }
 
 LeapFrog::~LeapFrog() {
@@ -227,6 +235,7 @@ void LeapFrog::iterate() {
 Verlet::Verlet(std::string filename, double dt)
 	: Integrator(filename) {
 	// Create new Integrator.
+	this->name = "Verlet";
 	this->dt = dt;
 	this->rx_last = new double[this->nbs->N];
 	this->ry_last = new double[this->nbs->N];
@@ -314,6 +323,7 @@ void Verlet::iterate() {
 HermitePC::HermitePC(std::string filename, double dt)
 	: Integrator(filename) {
 	// Create new Integrator.
+	this->name = "HermitePC";
 	this->dt = dt;
 	this->rx_p = new double[this->nbs->N];
 	this->ry_p = new double[this->nbs->N];
@@ -454,6 +464,7 @@ void HermitePC::iterate() {
 HermiteIterated::HermiteIterated(std::string filename, double dt, int iteration_depth)
 	: Integrator(filename) {
 	// Create new Integrator.
+	this->name = "HermiteIterated";
 	this->iteration_depth = iteration_depth;
 	this->dt = dt;
 	this->rx_p = new double[this->nbs->N];
@@ -612,6 +623,7 @@ void HermiteIterated::iterate() {
 RungeKutta::RungeKutta(std::string filename, double dt)
 	: Integrator(filename) {
 	// Create new Integrator.
+	this->name = "RungeKutta";
 	this->dt = dt;
 	this->rx_t = new double[this->nbs->N];
 	this->ry_t = new double[this->nbs->N];

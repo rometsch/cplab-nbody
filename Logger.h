@@ -11,7 +11,10 @@
 
 #include "Integrators.h"
 #include <vector>
+#include <sstream>
 
+#include <iostream>
+#include <chrono>
 
 
 class Logger {
@@ -41,9 +44,21 @@ public:
 	Logger(Integrator *integrator);
 	virtual ~Logger();
 
-	void iterate(int Niter, int step);
+	void iterate(double time, int step);		// Iterate Niter times and save every step-th system status.
+	void iterate(int step);		// Iterate until time of the system reached tmax. Time means the time of the simulated system rather than real time. Save every step-th system status.
 	void snapshot();
 	void plot_trajectories();
+	void plot_system();
+	void plot_drift(std::vector<double> &var, std::string var_name);
+	void plot_energy_drift();
+	void plot_lenz_drift();
+	void output_drift(std::ostream &out, std::vector<double> &var, std::string var_name);
+	void output_energy_drift(std::ostream &out);
+	void output_lenz_drift(std::ostream &out);
+	void output_drift_two_body(std::ostream &out);
+
+
+	void calc_delta(std::vector<double> &var, std::vector<double> &delta, std::vector<double> &t);
 };
 
 #endif /* LOGGER_H_ */

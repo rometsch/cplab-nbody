@@ -15,6 +15,7 @@ public:
 	nbsys *nbs;		// N-body system.
 	double dt;
 	double *rx_next, *ry_next, *rz_next, *vx_next, *vy_next, *vz_next; 	// Position, velocity and acceleration components.
+	std::string name;
 
 	Integrator(std::string filename);
 	virtual ~Integrator();
@@ -22,6 +23,8 @@ public:
 	virtual void start() = 0;			// Start the integrator. E.g. jumpstart for Leap Frog.
 	virtual void stop() = 0;			// Stop the integrator.	E.g. stop for Leap Frog.
 	virtual void iterate() = 0;		// Iterate once.
+
+	void set_dt(double dt);		// Set dt value;
 };
 
 class Euler: public Integrator {
@@ -36,11 +39,11 @@ public:
 	void iterate_ind(int i);
 };
 
-class Euler_Comer: public Integrator {
+class EulerComer: public Integrator {
 public:
 
-	Euler_Comer(std::string filename, double dt);
-	virtual ~Euler_Comer();
+	EulerComer(std::string filename, double dt);
+	virtual ~EulerComer();
 
 	void start();
 	void stop();

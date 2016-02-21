@@ -8,6 +8,7 @@
 #include "Logger.h"
 #include "gnuplot_i.hpp"
 
+
 Logger::Logger(Integrator *integrator) {
 	this->integrator = integrator;
 	this->nbs = integrator->nbs;
@@ -24,18 +25,38 @@ Logger::~Logger() {
 	// TODO Auto-generated destructor stub
 }
 
-void Logger::iterate(int Niter, int step) {
-	// Iterate Niter times and keep every step-th system status.
-	for (int i=0; i<Niter; i++) {
+void Logger::iterate(double time,int step) {
+	// Iterate time (in units of t_max) and keep every step-th system status.
+	integrator->start();
+	int cnt = 0;
+	while (this->sim_time < time*this->nbs->t_max) {
 		integrator->iterate();
 		this->sim_time += this->integrator->dt;
-		this->nbs->calc_energy();
-		std::cout << this->nbs->E << std::endl;
 		// Store every step-th set of positions.
-		if (i%step == 0) {
+		if (++cnt%step == 0) {
+			this->nbs->calc_energy();
+			this->nbs->calc_two_body_vars();
 			this->snapshot();
 		}
 	}
+	integrator->stop();
+}
+
+void Logger::iterate(int step) {
+	// Iterate Niter times and keep every step-th system status.
+	integrator->start();
+	int cnt = 0;
+	while (this->sim_time < this->nbs->t_max) {
+		integrator->iterate();
+		this->sim_time += this->integrator->dt;
+		this->nbs->calc_energy();
+		this->nbs->calc_two_body_vars();
+		// Store every step-th set of positions.
+		if (++cnt%step == 0) {
+			this->snapshot();
+		}
+	}
+	integrator->stop();
 }
 
 void Logger::snapshot() {
@@ -86,5 +107,86 @@ void Logger::plot_trajectories() {
 		std::stringstream title;
 		title << "Particle " << i << " with m = " << this->nbs->m[i];
 		gp.plot_xyz(X[i],Y[i],Z[i], title.str());
+	}
+}
+
+void Logger::plot_system() {
+	// Plot the stored trajectories.
+	// First Copy data to vectors.
+	std::vector<double> x,y,z;
+	for (int i=0; i<this->nbs->N; i++) {
+		x.push_back(this->nbs->rx[i]);
+		y.push_back(this->nbs->ry[i]);
+		z.push_back(this->nbs->rz[i]);
+	}
+
+	Gnuplot gp;
+	gp << "set size ratio -1\n";
+	std::stringstream title;
+	title << this->nbs->N << "-body system" << std::endl;
+	gp.plot_xyz(x, y, z, title.str());
+}
+
+void Logger::plot_drift(std::vector<double> &var, std::string var_name) {
+	// Plot the difference of var at a given time to var at start as a function of time.
+	std::vector<double> delta, t;
+	this->calc_delta(var, delta, t);
+//	std::cout << this->simulation_time.size() << std::endl;
+//	std::cout << delta.size() << " , " << t.size() << std::endl;
+
+	Gnuplot gp;
+	std::stringstream title;
+	title << var_name << " drift" << std::endl;
+	gp << "set logscale y 10 \n";
+	gp << "set format y \"%s*10^{%S}\"\n";
+	gp.plot_xy(t, delta, title.str());
+	gp << "pause mouse any \"Any key or button will terminate\"\n";
+}
+
+void Logger::plot_energy_drift() {
+	// Plot drift of energy with time.
+	this->plot_drift(this->E,"energy");
+}
+
+void Logger::plot_lenz_drift() {
+	this->plot_drift(this->e, "lenz");
+}
+
+void Logger::output_drift(std::ostream &out, std::vector<double> &var, std::string var_name) {
+	// Plot the difference of var at a given time to var at start as a function of time.
+	std::vector<double> delta, t;
+	this->calc_delta(var, delta, t);
+	out << "# time\tdelta_" << var_name << std::endl;
+	for (int i=0; i<t.size(); i++) {
+		out << t[i] << "\t" << delta[i] << std::endl;
+	}
+}
+
+void Logger::output_energy_drift(std::ostream &out) {
+	this->output_drift(out,this->E, "energy");
+}
+void Logger::output_lenz_drift(std::ostream &out) {
+	this->output_drift(out,this->e, "lenz");
+}
+
+void Logger::output_drift_two_body(std::ostream &out) {
+	// Plot the difference of var at a given time to var at start as a function of time.
+	std::vector<double> delta_E,delta_e, delta_ae, t, dummy;
+	this->calc_delta(this->E, delta_E, t);
+	this->calc_delta(this->e, delta_e, dummy);
+	this->calc_delta(this->ae, delta_ae, dummy);
+	out << "# time\tdelta_E\tdelta_e\tdelta_ae" << std::endl;
+	for (int i=0; i<t.size(); i++) {
+		out << t[i] << "\t" << delta_E[i] << "\t" << delta_e[i] << "\t" << delta_ae[i]  << std::endl;
+	}
+}
+
+void Logger::calc_delta(std::vector<double> &var, std::vector<double> &delta, std::vector<double> &t) {
+	// Calculate the difference between var[0] and all entries and save the simulation time for these entries in t.
+	// Auxiliary function for plots and data save routines.
+	double var0 = var[0];
+	for (int i=1; i<this->simulation_time.size(); i++) {
+		delta.push_back(fabs(var[i]-var0));
+		t.push_back(this->simulation_time[i]);
 	}
 }

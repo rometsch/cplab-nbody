@@ -38,14 +38,15 @@ public:
 	virtual ~nbsys();
 
 	void calc_energy();			// Calculate the total energy.
+	void calc_two_body_vars();	// Calculate system variables for two body system.
 	void calc_com();			// Calculate the center of mass, its velocity.
 	void calc_momentum();		// Calculate the total momentum.
 	void calc_angular_momentum();
 
 	void calc_acc();	// Calculate the acceleration for all particles.
 	void calc_dot_acc();	// Calculate the time derivative oft the acceleration for all particles.
-	void acc(int i);	// Calculate the acceleration for particle i.
-	void dot_acc(int i);	// Calculate time derivative of acceleration for particle i.
+	void acc(int i, double *rx, double *ry, double *rz, double *ax, double *ay, double *az);	// Calculate the acceleration for particle i.
+	void dot_acc(int i, double *rx, double *ry, double *rz, double *vx, double *vy, double *vz, double *adotx, double *adoty, double *adotz);	// Calculate time derivative of acceleration for particle i.
 
 	void load_data(std::string filename);		// Load initial data from file.
 	void transform_to_com();	// Transform the coordinates and velocities to
