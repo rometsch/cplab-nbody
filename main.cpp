@@ -34,8 +34,8 @@ void aufgabe3() {
 
 	int num_data_pts = 1000;
 
-	std::string datafile_100 = "/Users/thomas/GoogleDrive/uni/ComPhy/n-body/data/pl.100";
-	std::string datafile_1k = "/Users/thomas/GoogleDrive/uni/ComPhy/n-body/data/pl.1k";
+	std::string datafile_100 = "./data/pl.100";
+	std::string datafile_1k = "./data/pl.1k";
 
 	for (int i=0; i<6	; i++) {
 //		save_N_body_sim_to_file(new Euler(datafile_100, 1.0), eta[i], num_of_tmax, num_data_pts, "aufgabe3/", "_100_"+std::to_string(eta[i])+".txt");
@@ -62,9 +62,9 @@ void aufgabe2b() {
 	int num_data_pts = 20;
 	double eta = 0.01;
 	std::vector<std::string> filenames;
-	filenames.push_back("/Users/thomas/GoogleDrive/uni/ComPhy/n-body/data/in2");
-	filenames.push_back("/Users/thomas/GoogleDrive/uni/ComPhy/n-body/data/in2i");
-	filenames.push_back("/Users/thomas/GoogleDrive/uni/ComPhy/n-body/data/in2ii");
+	filenames.push_back("./data/in2");
+	filenames.push_back("./data/in2i");
+	filenames.push_back("./data/in2ii");
 
 	// Simulation für alle drei Datenfiles und alle Integratoren durchführen.
 	for (int i=0; i<3; i++) {
@@ -85,7 +85,7 @@ void aufgabe2a() {
 	double eta[5] = {0.5, 0.1, 0.05, 0.01, 0.005};
 	int num_eta = 5;
 	int num_data_pts = 20;
-	std::string datafile_path = "/Users/thomas/Documents/workspace/n-body/data/in2";
+	std::string datafile_path = "./data/in2";
 
 	// Für alle Integratoren und für alle eta Log in Datei speichern.
 	for (int i=0; i<num_eta ; i++ ) {

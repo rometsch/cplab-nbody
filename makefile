@@ -39,6 +39,7 @@ n-body: $(OBJS) $(USER_OBJS)
 	mkdir aufgabe2a
 	mkdir aufgabe2b
 	mkdir aufgabe3
+	mkdir plots
 
 # Other Targets
 clean:
